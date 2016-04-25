@@ -11,6 +11,13 @@ struct Action
     ActionType action;
 };
 
+struct ActionDuration
+{
+    int32_t id;
+    ActionType action;
+    int32_t duration;
+};
+
 struct Position
 {
     int32_t id;

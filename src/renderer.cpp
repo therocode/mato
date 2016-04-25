@@ -21,30 +21,40 @@ AimGraphics toAimGraphics(float aim)
 }
 
 Renderer::Renderer(fea::Renderer2D& renderer) : mRenderer(renderer),
-        mBodyQuad({48.0f, 24.0f}),
-        mHeadQuad({56.0f, 72.0f})
+        mBodyQuad({24.0f, 12.0f}),
+        mHeadQuad({28.0f, 36.0f})
 {
     mBodyTexture = makeTexture("data/textures/body.png");
     
     mHeadTexture = makeTexture("data/textures/head.png");
     
-    mBodyIdle = fea::Animation{{0,0}, {48, 24}, 1, 10};
-    mBodyWalking = fea::Animation{{0,0}, {48, 24}, 4, 10};
-    mAim = fea::Animation{{0,0}, {56, 72}, 5, 1};
+    mBodyIdle = fea::Animation{{0,0}, {24, 12}, 1, 10};
+    mBodyWalking = fea::Animation{{0,0}, {24, 24}, 4, 10};
+    mAim = fea::Animation{{0,0}, {28, 36}, 5, 1};
 
     mBodyQuad.setAnimation(mBodyIdle);
     mHeadQuad.setAnimation(mAim);
 }
 
-//temp hack for anim
-std::unordered_map<int32_t, int32_t> ticks;
+void Renderer::startFrame()
+{
+    mRenderer.clear();
+}
 
-void Renderer::renderObjects(const std::vector<Position>& positions, const std::vector<Aim>& aims, const std::vector<Action>& actions)
+void Renderer::renderWorld(const uint8_t* foregroundPixels, const glm::ivec2& size)
+{
+    mLandscapeMap.create(size, foregroundPixels);
+
+    fea::Quad landscapeQuad(size * 4);
+    landscapeQuad.setTexture(mLandscapeMap);
+    
+    mRenderer.render(landscapeQuad);
+}
+
+void Renderer::renderObjects(const std::vector<Position>& positions, const std::vector<Aim>& aims, const std::vector<ActionDuration>& actions)
 {
     auto positionIter = positions.begin();
     auto aimIter = aims.begin();
-
-    mRenderer.clear();
 
     auto nextValid = [&positionIter, &aimIter, &positions, &aims] ()
     {
@@ -64,9 +74,7 @@ void Renderer::renderObjects(const std::vector<Position>& positions, const std::
         const glm::vec2& position = positionIter->position;
         float aim = aimIter->aim;
 
-        ticks.emplace(aimIter->id, 0);
-
-        auto actionIter = std::find_if(actions.begin(), actions.end(), [aimIter] (const Action& action)
+        auto actionIter = std::find_if(actions.begin(), actions.end(), [aimIter] (const ActionDuration& action)
         {
             return action.id == aimIter->id;
         });
@@ -74,26 +82,23 @@ void Renderer::renderObjects(const std::vector<Position>& positions, const std::
         bool isWalking = actionIter != actions.end() && (actionIter->action == ActionType::WALK_RIGHT || actionIter->action == ActionType::WALK_LEFT);
 
         AimGraphics aimGraphics = toAimGraphics(aim);
-        glm::vec2 bodyOffset = aimGraphics.flip ? glm::vec2(48.0f, 0.0f) : glm::vec2();
+        glm::vec2 bodyOffset = aimGraphics.flip ? glm::vec2(24.0f, 0.0f) : glm::vec2();
 
         mBodyQuad.setTexture(mBodyTexture);
-        mBodyQuad.setOrigin(glm::vec2(42.0f, 0.0f));
+        mBodyQuad.setOrigin(glm::vec2(21.0f, 0.0f));
         mBodyQuad.setPosition(position + bodyOffset);
         mBodyQuad.setHFlip(aimGraphics.flip);
         mBodyQuad.setAnimation(isWalking ? mBodyWalking : mBodyIdle);
-        mBodyQuad.setAnimationFrame(ticks[aimIter->id] / 5 % 4);
+        mBodyQuad.setAnimationFrame(isWalking ? actionIter->duration / 5 % 4 : 1);
 
         mHeadQuad.setTexture(mHeadTexture);
         mHeadQuad.setAnimationFrame(aimGraphics.keyFrame);
-        mHeadQuad.setOrigin(glm::vec2(26.0f, 56.0f));
+        mHeadQuad.setOrigin(glm::vec2(13.0f, 28.0f));
         mHeadQuad.setPosition(position);
         mHeadQuad.setHFlip(aimGraphics.flip);
 
         mRenderer.render(mBodyQuad);
         mRenderer.render(mHeadQuad);
-
-        if(isWalking)
-            ++ticks[aimIter->id];
 
         ++positionIter;
         ++aimIter;

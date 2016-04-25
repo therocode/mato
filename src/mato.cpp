@@ -3,12 +3,16 @@
 #include "data.hpp"
 #include "aim.hpp"
 #include "binarysearch.hpp"
+#include "texturemaker.hpp"
 #include <fea/ui/sdl2windowbackend.hpp>
 #include <fea/ui/sdl2inputbackend.hpp>
 
 std::vector<Position> positions;
 std::vector<Aim> aims;
 std::vector<Health> health;
+std::vector<ActionDuration> actionDurations;
+
+PixelMap landscapeForeground;
 
 const float walkSpeed = 4.0f;
 const float aimSpeed = pi / 30.0f;
@@ -38,6 +42,52 @@ void createInitialData()
             1,
             -halfPi,
     });
+
+    landscapeForeground = makePixelMap("data/textures/worldforeground.png");
+}
+
+void updateActionDurations(const std::vector<Action>& actions, std::vector<ActionDuration>& durations)
+{
+    std::vector<int32_t> toErase;
+
+    for(int32_t i = 0; i < static_cast<int32_t>(durations.size()); ++i)
+    {
+        ActionDuration& duration = durations[i];
+
+        auto actionIter = std::find_if(actions.begin(), actions.end(), [&duration] (const Action& action)
+        {
+            return duration.id == action.id && duration.action == action.action;
+        });
+
+        if(actionIter != actions.end())
+        {
+            ++duration.duration;
+        }
+        else
+        {
+            toErase.emplace_back(i);
+        }
+    }
+
+    std::reverse(toErase.begin(), toErase.end());
+
+    for(auto index : toErase)
+    {
+        durations.erase(durations.begin() + index);
+    }
+
+    for(int32_t i = 0; i < static_cast<int32_t>(actions.size()); ++i)
+    {
+        const Action& action = actions[i];
+
+        auto durationIter = std::find_if(durations.begin(), durations.end(), [&action] (const ActionDuration& duration)
+        {
+            return duration.id == action.id && duration.action == action.action;
+        });
+
+        if(durationIter == durations.end())
+            durations.emplace_back(ActionDuration{action.id, action.action, 1});
+    }
 }
 
 void applyActions(const std::vector<Action>& actions)
@@ -109,9 +159,12 @@ void Mato::loop()
 {
     std::vector<Action> actions = mInputHandler.process();
 
+    updateActionDurations(actions, actionDurations);
     applyActions(actions);
 
-    mRenderer.renderObjects(positions, aims, actions);
+    mRenderer.startFrame();
+    mRenderer.renderWorld(landscapeForeground.pixels(), landscapeForeground.size());
+    mRenderer.renderObjects(positions, aims, actionDurations);
 
     mWindow.swapBuffers();
     mAudioPlayer.update();

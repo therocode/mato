@@ -6,6 +6,7 @@
 #include "messages.hpp"
 #include "audioplayer.hpp"
 #include "renderer.hpp"
+#include "pixelmap.hpp"
 
 class Mato : public fea::Application,
     public fea::MessageReceiver<QuitMessage>
