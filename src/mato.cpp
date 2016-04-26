@@ -17,6 +17,10 @@ PixelMap landscapeForeground;
 const float walkSpeed = 4.0f;
 const float aimSpeed = pi / 30.0f;
 
+void loadResources()
+{
+}
+
 void createInitialData()
 {
     positions.emplace_back(
@@ -145,6 +149,8 @@ Mato::Mato() :
     mWindow.setFramerateLimit(60);
 
     subscribe(mBus, *this, false);
+
+    mResources.loadAll();
 
     createInitialData();
 }

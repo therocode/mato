@@ -7,6 +7,7 @@
 #include "audioplayer.hpp"
 #include "renderer.hpp"
 #include "pixelmap.hpp"
+#include "resourcemanager.hpp"
 
 class Mato : public fea::Application,
     public fea::MessageReceiver<QuitMessage>
@@ -25,4 +26,8 @@ class Mato : public fea::Application,
         InputHandler mInputHandler;
         AudioPlayer mAudioPlayer;
         Renderer mRenderer;
+
+        ResourceManager mResources;
+        std::vector<fea::Texture> mTextures;
+        std::vector<fea::Animation> mAnimations;
 };
