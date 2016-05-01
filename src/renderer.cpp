@@ -58,11 +58,11 @@ void Renderer::renderObjects(const std::vector<Position>& positions, const std::
 
     auto nextValid = [&positionIter, &aimIter, &positions, &aims] ()
     {
-        while(positionIter != positions.end() && aimIter != aims.end() && positionIter->id != aimIter->id)
+        while(positionIter != positions.end() && aimIter != aims.end() && positionIter->objectId != aimIter->objectId)
         {
-            if(positionIter->id < aimIter->id)
+            if(positionIter->objectId < aimIter->objectId)
                 ++positionIter;
-            else if(aimIter->id < positionIter->id)
+            else if(aimIter->objectId < positionIter->objectId)
                 ++aimIter;
         }
     };
@@ -76,7 +76,7 @@ void Renderer::renderObjects(const std::vector<Position>& positions, const std::
 
         auto actionIter = std::find_if(actions.begin(), actions.end(), [aimIter] (const ActionDuration& action)
         {
-            return action.id == aimIter->id;
+            return action.objectId == aimIter->objectId;
         });
 
         bool isWalking = actionIter != actions.end() && (actionIter->action == ActionType::WALK_RIGHT || actionIter->action == ActionType::WALK_LEFT);

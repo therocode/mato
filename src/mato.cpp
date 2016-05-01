@@ -4,50 +4,34 @@
 #include "aim.hpp"
 #include "binarysearch.hpp"
 #include "texturemaker.hpp"
+#include "createobject.hpp"
+#include "vectorutil.hpp"
 #include <fea/ui/sdl2windowbackend.hpp>
 #include <fea/ui/sdl2inputbackend.hpp>
-
-std::vector<Position> positions;
-std::vector<Aim> aims;
-std::vector<Health> health;
-std::vector<ActionDuration> actionDurations;
-
-PixelMap landscapeForeground;
 
 const float walkSpeed = 4.0f;
 const float aimSpeed = pi / 30.0f;
 
-void loadResources()
+void Mato::addObject(Object object)
+{
+    emplaceOptional(std::move(object.position), mPositions);
+    emplaceOptional(std::move(object.health), mHealth);
+    emplaceOptional(std::move(object.aim), mAims);
+
+    for(auto& displayInstance : object.displays)
+        mDisplays.emplace_back(std::move(displayInstance));
+}
+
+void Mato::loadResources()
 {
 }
 
-void createInitialData()
+void Mato::createInitialData()
 {
-    positions.emplace_back(
-    Position{
-            0,
-            {275.0f, 384.0f},
-    });
+    addObject(createObject(0, PLAYER, {275.0f, 384.0f}, mResources));
+    addObject(createObject(1, PLAYER, {1105.0f, 384.0f}, mResources));
 
-    aims.emplace_back(
-    Aim{
-            0,
-            halfPi,
-    });
-
-    positions.emplace_back(
-    Position{
-            1,
-            {1105.0f, 384.0f},
-    });
-
-    aims.emplace_back(
-    Aim{
-            1,
-            -halfPi,
-    });
-
-    landscapeForeground = makePixelMap("data/textures/worldforeground.png");
+    mLandscapeForeground = makePixelMap("data/textures/worldforeground.png");
 }
 
 void updateActionDurations(const std::vector<Action>& actions, std::vector<ActionDuration>& durations)
@@ -60,7 +44,7 @@ void updateActionDurations(const std::vector<Action>& actions, std::vector<Actio
 
         auto actionIter = std::find_if(actions.begin(), actions.end(), [&duration] (const Action& action)
         {
-            return duration.id == action.id && duration.action == action.action;
+            return duration.objectId == action.objectId && duration.action == action.action;
         });
 
         if(actionIter != actions.end())
@@ -86,28 +70,28 @@ void updateActionDurations(const std::vector<Action>& actions, std::vector<Actio
 
         auto durationIter = std::find_if(durations.begin(), durations.end(), [&action] (const ActionDuration& duration)
         {
-            return duration.id == action.id && duration.action == action.action;
+            return duration.objectId == action.objectId && duration.action == action.action;
         });
 
         if(durationIter == durations.end())
-            durations.emplace_back(ActionDuration{action.id, action.action, 1});
+            durations.emplace_back(ActionDuration{action.objectId, action.action, 1});
     }
 }
 
-void applyActions(const std::vector<Action>& actions)
+void applyActions(const std::vector<Action>& actions, std::vector<Position>& positions, std::vector<Aim>& aims)
 {
     for(const auto& actionData : actions)
     {
         const ActionType& action = actionData.action;
 
-        auto positionIter = binarySearch(positions.begin(), positions.end(), actionData.id, [] (int32_t id, const Position& position)
+        auto positionIter = binarySearch(positions.begin(), positions.end(), actionData.objectId, [] (int32_t id, const Position& position)
         {
-            return position.id == id;
+            return position.objectId == id;
         });
 
-        auto aimIter = binarySearch(aims.begin(), aims.end(), actionData.id, [] (int32_t id, const Aim& aim)
+        auto aimIter = binarySearch(aims.begin(), aims.end(), actionData.objectId, [] (int32_t id, const Aim& aim)
         {
-            return aim.id == id;
+            return aim.objectId == id;
         });
 
         if(positionIter != positions.end() && aimIter != aims.end())
@@ -165,12 +149,12 @@ void Mato::loop()
 {
     std::vector<Action> actions = mInputHandler.process();
 
-    updateActionDurations(actions, actionDurations);
-    applyActions(actions);
+    updateActionDurations(actions, mActionDurations);
+    applyActions(actions, mPositions, mAims);
 
     mRenderer.startFrame();
-    mRenderer.renderWorld(landscapeForeground.pixels(), landscapeForeground.size());
-    mRenderer.renderObjects(positions, aims, actionDurations);
+    mRenderer.renderWorld(mLandscapeForeground.pixels(), mLandscapeForeground.size());
+    mRenderer.renderObjects(mPositions, mAims, mActionDurations);
 
     mWindow.swapBuffers();
     mAudioPlayer.update();

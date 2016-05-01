@@ -8,6 +8,7 @@
 #include "renderer.hpp"
 #include "pixelmap.hpp"
 #include "resourcemanager.hpp"
+#include "object.hpp"
 
 class Mato : public fea::Application,
     public fea::MessageReceiver<QuitMessage>
@@ -15,9 +16,12 @@ class Mato : public fea::Application,
     public:
         Mato();
         void handleMessage(const QuitMessage& message) override;
+        void addObject(Object object);
     protected:
         void loop() override;
     private:
+        void loadResources();
+        void createInitialData();
         fea::MessageBus mBus;
         fea::Window mWindow;
         fea::Renderer2D mFeaRenderer;
@@ -26,8 +30,16 @@ class Mato : public fea::Application,
         InputHandler mInputHandler;
         AudioPlayer mAudioPlayer;
         Renderer mRenderer;
+        
+        //game data
+        std::vector<Position> mPositions;
+        std::vector<Aim> mAims;
+        std::vector<Health> mHealth;
+        std::vector<ActionDuration> mActionDurations;
+        std::vector<DisplayInstance> mDisplays;
 
+        PixelMap mLandscapeForeground;
+
+        //resources
         ResourceManager mResources;
-        std::vector<fea::Texture> mTextures;
-        std::vector<fea::Animation> mAnimations;
 };

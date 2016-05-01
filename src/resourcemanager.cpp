@@ -22,13 +22,13 @@ void ResourceManager::loadAll()
 
     auto newDisplay = [this] (const std::string& name, RenderDisplay display)
     {
-        mDisplayNameIndex.emplace(name, display.id);
+        mDisplayNameIndex.emplace(name, display.displayId);
         mDisplays.emplace_back(std::move(display));
     };
 
-    newDisplay("body_idle", RenderDisplay{0, texture("body"), animation("body_idle")});
-    newDisplay("body_walk", RenderDisplay{1, texture("body"), animation("body_walk")});
-    newDisplay("head_aim", RenderDisplay{2, texture("head"), animation("head_aim")});
+    newDisplay("body_idle", RenderDisplay{0, {}, texture("body"), animation("body_idle")});
+    newDisplay("body_walk", RenderDisplay{1, {}, texture("body"), animation("body_walk")});
+    newDisplay("head_aim", RenderDisplay{2, {}, texture("head"), animation("head_aim")});
 }
 
 const std::vector<RenderDisplay> ResourceManager::displays() const

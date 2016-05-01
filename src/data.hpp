@@ -8,33 +8,40 @@ smart_enum_class(ActionType, WALK_LEFT, WALK_RIGHT, AIM_UP, AIM_DOWN, JUMP, FIRE
 
 struct Action
 {
-    int32_t id;
+    int32_t objectId;
     ActionType action;
 };
 
 struct ActionDuration
 {
-    int32_t id;
+    int32_t objectId;
     ActionType action;
     int32_t duration;
 };
 
 struct Position
 {
-    int32_t id;
+    int32_t objectId;
     glm::vec2 position;
 };
 
 struct Aim
 {
-    int32_t id;
+    int32_t objectId;
     float aim;
 };
 
 struct Health
 {
-    int32_t id;
+    int32_t objectId;
     int32_t health;
+};
+
+//many-to-many relationship between objects and render displays
+struct DisplayInstance
+{
+    int32_t objectId;
+    int32_t displayId;
 };
 
 //rendering data
@@ -55,7 +62,8 @@ namespace fea
 
 struct RenderDisplay
 {
-    int32_t id;
+    int32_t displayId;
+    glm::vec2 offset;
     const fea::Texture* texture;
     const fea::Animation* animation;
 };
