@@ -74,19 +74,24 @@ void Mato::updateActionDurations(const std::vector<Action>& actions)
     std::vector<ActionDuration> newDurations;
     newDurations.reserve(mActionDurations.size());
 
-    for(int32_t i = 0; i < static_cast<int32_t>(mActionDurations.size()); ++i)
+    for(int32_t i = 0; i < static_cast<int32_t>(actions.size()); ++i)
     {
-        ActionDuration& duration = mActionDurations[i];
+        const Action& action = actions[i];
 
-        auto actionIter = std::find_if(actions.begin(), actions.end(), [&duration] (const Action& action)
+        auto actionDurationIter = std::find_if(mActionDurations.begin(), mActionDurations.end(), [&action] (const ActionDuration& duration)
         {
             return duration.objectId == action.objectId && duration.action == action.action;
         });
 
-        if(actionIter != actions.end())
+        if(actionDurationIter != mActionDurations.end())
         {
+            ActionDuration duration = *actionDurationIter;
             ++duration.duration;
             newDurations.push_back(duration);
+        }
+        else
+        {
+            newDurations.push_back(ActionDuration{action.objectId, action.action, 1});
         }
     }
 
@@ -102,7 +107,7 @@ void Mato::renderDisplays()
     {
         auto idFinder = [&display] (const auto& entry) { return entry.objectId == display.objectId; };
 
-        const Position* position = findIf(mPositions, idFinder); TH_ASSERT(position, "Something had a display but no position");
+        const Position* position = findIf(mPositions, idFinder); TH_ASSERT(position, "Entry with Display ID " << display.displayId << " had a display but no position");
 
         orders.emplace_back(
             RenderOrder{
