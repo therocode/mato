@@ -26,12 +26,12 @@ void ResourceManager::loadAll()
         mDisplays.emplace_back(std::move(display));
     };
 
-    newDisplay("body_idle", RenderDisplay{0, {}, texture("body"), animation("body_idle")});
-    newDisplay("body_walk", RenderDisplay{1, {}, texture("body"), animation("body_walk")});
-    newDisplay("head_aim", RenderDisplay{2, {}, texture("head"), animation("head_aim")});
+    newDisplay("body_idle", RenderDisplay{0, {-12.0f, 24.0f}, texture("body"), animation("body_idle")});
+    newDisplay("body_walk", RenderDisplay{1, {-12.0f, 24.0f}, texture("body"), animation("body_walk")});
+    newDisplay("head_aim", RenderDisplay{2, {-4.0f, -8.0f}, texture("head"), animation("head_aim")});
 }
 
-const std::vector<RenderDisplay> ResourceManager::displays() const
+const std::vector<RenderDisplay>& ResourceManager::displays() const
 {
     return mDisplays;
 }

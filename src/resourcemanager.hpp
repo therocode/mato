@@ -9,7 +9,7 @@ class ResourceManager
 {
     public:
         void loadAll();
-        const std::vector<RenderDisplay> displays() const;
+        const std::vector<RenderDisplay>& displays() const;
         int32_t displayFromName(const std::string& name) const;
     private:
         std::unordered_map<std::string, fea::Texture> mTextures;

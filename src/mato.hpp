@@ -20,26 +20,28 @@ class Mato : public fea::Application,
     protected:
         void loop() override;
     private:
-        void loadResources();
         void createInitialData();
+        void updateActionDurations(const std::vector<Action>& actions);
+        void renderDisplays();
         fea::MessageBus mBus;
         fea::Window mWindow;
         fea::Renderer2D mFeaRenderer;
         fea::InputHandler mFeaInputHandler;
 
+        //resources
+        ResourceManager mResources;
+
+        //modules
         InputHandler mInputHandler;
         AudioPlayer mAudioPlayer;
         Renderer mRenderer;
         
         //game data
         std::vector<Position> mPositions;
-        std::vector<Aim> mAims;
+        std::vector<PlayerAim> mPlayerAims;
         std::vector<Health> mHealth;
         std::vector<ActionDuration> mActionDurations;
         std::vector<DisplayInstance> mDisplays;
 
         PixelMap mLandscapeForeground;
-
-        //resources
-        ResourceManager mResources;
 };

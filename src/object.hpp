@@ -7,7 +7,7 @@ enum ObjectType { PLAYER };
 struct Object
 {
     th::Optional<Position> position;
-    th::Optional<Aim> aim;
+    th::Optional<PlayerAim> playerAim;
     th::Optional<Health> health;
     std::vector<DisplayInstance> displays;
 };

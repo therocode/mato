@@ -2,6 +2,7 @@
 #include "renderer.hpp"
 #include "texturemaker.hpp"
 #include "aim.hpp"
+#include "vectorutil.hpp"
 
 struct AimGraphics
 {
@@ -20,20 +21,10 @@ AimGraphics toAimGraphics(float aim)
     return {keyFrame, flip};
 }
 
-Renderer::Renderer(fea::Renderer2D& renderer) : mRenderer(renderer),
-        mBodyQuad({24.0f, 12.0f}),
-        mHeadQuad({28.0f, 36.0f})
+Renderer::Renderer(fea::Renderer2D& renderer, const std::vector<RenderDisplay>& displays):
+    mRenderer(renderer),
+    mDisplays(displays)
 {
-    mBodyTexture = makeTexture("data/textures/body.png");
-    
-    mHeadTexture = makeTexture("data/textures/head.png");
-    
-    mBodyIdle = fea::Animation{{0,0}, {24, 12}, 1, 10};
-    mBodyWalking = fea::Animation{{0,0}, {24, 24}, 4, 10};
-    mAim = fea::Animation{{0,0}, {28, 36}, 5, 1};
-
-    mBodyQuad.setAnimation(mBodyIdle);
-    mHeadQuad.setAnimation(mAim);
 }
 
 void Renderer::startFrame()
@@ -51,57 +42,26 @@ void Renderer::renderWorld(const uint8_t* foregroundPixels, const glm::ivec2& si
     mRenderer.render(landscapeQuad);
 }
 
-void Renderer::renderObjects(const std::vector<Position>& positions, const std::vector<Aim>& aims, const std::vector<ActionDuration>& actions)
+void Renderer::render(const std::vector<RenderOrder>& orders) const
 {
-    auto positionIter = positions.begin();
-    auto aimIter = aims.begin();
-
-    auto nextValid = [&positionIter, &aimIter, &positions, &aims] ()
+    for(const auto& renderOrder : orders)
     {
-        while(positionIter != positions.end() && aimIter != aims.end() && positionIter->objectId != aimIter->objectId)
-        {
-            if(positionIter->objectId < aimIter->objectId)
-                ++positionIter;
-            else if(aimIter->objectId < positionIter->objectId)
-                ++aimIter;
-        }
-    };
+        const RenderDisplay* display = findIf(mDisplays, [&renderOrder] (const RenderDisplay& disp) { return disp.displayId == renderOrder.displayId; });
+        TH_ASSERT(display, "render order uses invalid display " << renderOrder.displayId);
 
-    nextValid();
+        fea::AnimatedQuad quad(renderOrder.size);
 
-    while(positionIter != positions.end() && aimIter != aims.end())
-    {
-        const glm::vec2& position = positionIter->position;
-        float aim = aimIter->aim;
+        if(display->texture)
+            quad.setTexture(*display->texture);
+        if(display->animation)
+            quad.setAnimation(*display->animation);
 
-        auto actionIter = std::find_if(actions.begin(), actions.end(), [aimIter] (const ActionDuration& action)
-        {
-            return action.objectId == aimIter->objectId;
-        });
+        quad.setAnimationFrame(renderOrder.animationProgress / display->animation->getDelay() % display->animation->getFrameAmount());
 
-        bool isWalking = actionIter != actions.end() && (actionIter->action == ActionType::WALK_RIGHT || actionIter->action == ActionType::WALK_LEFT);
+        quad.setPosition(renderOrder.position + display->offset);
+        quad.setRotation(renderOrder.rotation - pi / 2.0f); //take away pi/2.0f which is a quarter of a full turn because featherkit expects 0 degrees to be --> but in the game, it is downwards
+        quad.setHFlip(renderOrder.flip);
 
-        AimGraphics aimGraphics = toAimGraphics(aim);
-        glm::vec2 bodyOffset = aimGraphics.flip ? glm::vec2(24.0f, 0.0f) : glm::vec2();
-
-        mBodyQuad.setTexture(mBodyTexture);
-        mBodyQuad.setOrigin(glm::vec2(21.0f, 0.0f));
-        mBodyQuad.setPosition(position + bodyOffset);
-        mBodyQuad.setHFlip(aimGraphics.flip);
-        mBodyQuad.setAnimation(isWalking ? mBodyWalking : mBodyIdle);
-        mBodyQuad.setAnimationFrame(isWalking ? actionIter->duration / 5 % 4 : 1);
-
-        mHeadQuad.setTexture(mHeadTexture);
-        mHeadQuad.setAnimationFrame(aimGraphics.keyFrame);
-        mHeadQuad.setOrigin(glm::vec2(13.0f, 28.0f));
-        mHeadQuad.setPosition(position);
-        mHeadQuad.setHFlip(aimGraphics.flip);
-
-        mRenderer.render(mBodyQuad);
-        mRenderer.render(mHeadQuad);
-
-        ++positionIter;
-        ++aimIter;
-        nextValid();
+        mRenderer.render(quad);
     }
 }

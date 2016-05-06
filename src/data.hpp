@@ -25,7 +25,7 @@ struct Position
     glm::vec2 position;
 };
 
-struct Aim
+struct PlayerAim
 {
     int32_t objectId;
     float aim;
@@ -37,11 +37,27 @@ struct Health
     int32_t health;
 };
 
+struct HeadBodyDisplayInstance
+{
+    int32_t objectId;
+    int32_t headDisplayId;
+    int32_t headAnimationProgress;
+    glm::vec2 headSize;
+    int32_t bodyDisplayId;
+    int32_t bodyAnimationProgress;
+    glm::vec2 bodySize;
+    bool flip;
+};
+
 //many-to-many relationship between objects and render displays
 struct DisplayInstance
 {
     int32_t objectId;
     int32_t displayId;
+    glm::vec2 size;
+    float rotation;
+    int32_t animationProgress;
+    bool flip;
 };
 
 //rendering data
@@ -50,8 +66,9 @@ struct RenderOrder
     glm::vec2 position;
     glm::vec2 size;
     int32_t displayId;
-    float angle = pi / 2.0f;
+    float rotation = pi / 2.0f;
     int32_t animationProgress = 0;
+    bool flip;
 };
 
 namespace fea
