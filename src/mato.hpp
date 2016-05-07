@@ -42,6 +42,7 @@ class Mato : public fea::Application,
         //game data
         std::vector<Position> mPositions;
         std::vector<Physics> mPhysics;
+        std::vector<CollisionBox> mCollisionBoxes;
         std::vector<Aim> mAims;
         std::vector<Health> mHealth;
         std::vector<ActionDuration> mActionDurations;

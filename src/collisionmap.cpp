@@ -19,6 +19,12 @@ const glm::ivec2& CollisionMap::size() const
     return mSize;
 }
 
+WallType CollisionMap::at(const glm::ivec2& coordinate) const
+{
+    TH_ASSERT(coordinate.x > 0 && coordinate.y > 0 && coordinate.x < mSize.x && coordinate.y < mSize.y, "collision map accessed out of bounds at " << coordinate.x << " " << coordinate.y);
+    return mCollisionValues[coordinate.x + coordinate.y * mSize.x];
+}
+
 CollisionMap makeCollisionMap(const std::string& path)
 {
     uint32_t width;

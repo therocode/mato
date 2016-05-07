@@ -8,6 +8,7 @@
 #include "action.hpp"
 #include "aimgraphics.hpp"
 #include "physics.hpp"
+#include "landscapecollision.hpp"
 #include <fea/ui/sdl2windowbackend.hpp>
 #include <fea/ui/sdl2inputbackend.hpp>
 
@@ -42,6 +43,7 @@ void Mato::addObject(Object object)
 {
     emplaceOptional(std::move(object.position), mPositions);
     emplaceOptional(std::move(object.physics), mPhysics);
+    emplaceOptional(std::move(object.collisionBox), mCollisionBoxes);
     emplaceOptional(std::move(object.health), mHealth);
     emplaceOptional(std::move(object.aim), mAims);
 
@@ -62,8 +64,21 @@ void Mato::loop()
     updateAimSprites();
     updateWalkSprites();
 
+    //mLastPositions = mPositions;
     updateVelocities(mPhysics, 0.5f);
     updatePositions(mPhysics, mPositions);
+
+    std::vector<LandscapeCollision> landscapeColliders = checkLandscapeCollisions(mPositions, mCollisionBoxes, mLandscapeCollision);
+
+    for(const auto& landscapeCollider : landscapeColliders)
+    {
+        Physics* physics = findIf(mPhysics, [&landscapeCollider] (const Physics& entry)
+        {
+            return entry.objectId == landscapeCollider.objectId;
+        });
+
+        physics->velocity = {};
+    }
 
     mRenderer.startFrame();
     mRenderer.renderWorld(mLandscapeForeground.pixels(), mLandscapeForeground.size());

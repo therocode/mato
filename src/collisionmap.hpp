@@ -13,6 +13,7 @@ class CollisionMap
         CollisionMap(std::vector<WallType> collisionValues, glm::ivec2 size);
         const WallType* collisionValues() const;
         const glm::ivec2& size() const;
+        WallType at(const glm::ivec2& coordinate) const;
     private:
         std::vector<WallType> mCollisionValues;
         glm::ivec2 mSize;

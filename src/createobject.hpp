@@ -15,6 +15,12 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
             {},
             {},
         };
+        result.collisionBox = CollisionBox
+        {
+            id,
+            {-12.0f, -12.0f},
+            {28.0f, 36.0f},
+        };
         result.aim = Aim{id, pi/2.0f};
         result.health = Health{id, 100};
         result.sprites =
