@@ -11,38 +11,38 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
     {
         result.aim = Aim{id, pi/2.0f};
         result.health = Health{id, 100};
-        result.displays =
+        result.sprites =
         {
             //body
-            DisplayInstance
+            Sprite
             {
                 id,
-                resources.displayFromName("body_walk"),
+                resources.appearanceFromName("body_walk"),
                 {24.0f, 12.0f}, //size
                 pi / 2.0f,
                 0,
                 false,
             },
             //head
-            DisplayInstance
+            Sprite
             {
                 id,
-                resources.displayFromName("head_aim"),
+                resources.appearanceFromName("head_aim"),
                 {28.0f, 36.0f}, //size
                 pi / 2.0f,
                 0,
                 false,
             },
         };
-        result.walkDisplayInfo = WalkDisplayInfo
+        result.walkSpriteInfo = WalkSpriteInfo
         {
             id,
-            resources.displayFromName("body_walk"),
+            resources.appearanceFromName("body_walk"),
         };
-        result.aimDisplayInfo = AimDisplayInfo
+        result.aimSpriteInfo = AimSpriteInfo
         {
             id,
-            resources.displayFromName("head_aim"),
+            resources.appearanceFromName("head_aim"),
         };
     }
 

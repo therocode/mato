@@ -20,23 +20,23 @@ void ResourceManager::loadAll()
         return mAnimations.count(name) != 0 ? &mAnimations.at(name) : nullptr;
     };
 
-    auto newDisplay = [this] (const std::string& name, RenderDisplay display)
+    auto newAppearance = [this] (const std::string& name, Appearance appearance)
     {
-        mDisplayNameIndex.emplace(name, display.displayId);
-        mDisplays.emplace_back(std::move(display));
+        mAppearanceNameIndex.emplace(name, appearance.appearanceId);
+        mAppearances.emplace_back(std::move(appearance));
     };
 
-    newDisplay("body_idle", RenderDisplay{0, {-12.0f, 24.0f}, texture("body"), animation("body_idle")});
-    newDisplay("body_walk", RenderDisplay{1, {-12.0f, 20.0f}, texture("body"), animation("body_walk")});
-    newDisplay("head_aim", RenderDisplay{2, {-4.0f, -8.0f}, texture("head"), animation("head_aim")});
+    newAppearance("body_idle", Appearance{0, {-12.0f, 24.0f}, texture("body"), animation("body_idle")});
+    newAppearance("body_walk", Appearance{1, {-12.0f, 20.0f}, texture("body"), animation("body_walk")});
+    newAppearance("head_aim", Appearance{2, {-4.0f, -8.0f}, texture("head"), animation("head_aim")});
 }
 
-const std::vector<RenderDisplay>& ResourceManager::displays() const
+const std::vector<Appearance>& ResourceManager::appearances() const
 {
-    return mDisplays;
+    return mAppearances;
 }
 
-int32_t ResourceManager::displayFromName(const std::string& name) const
+int32_t ResourceManager::appearanceFromName(const std::string& name) const
 {
-    return mDisplayNameIndex.at(name);
+    return mAppearanceNameIndex.at(name);
 }

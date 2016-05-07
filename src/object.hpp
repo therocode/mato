@@ -9,7 +9,7 @@ struct Object
     th::Optional<Position> position;
     th::Optional<Aim> aim;
     th::Optional<Health> health;
-    std::vector<DisplayInstance> displays;
-    th::Optional<AimDisplayInfo> aimDisplayInfo;
-    th::Optional<WalkDisplayInfo> walkDisplayInfo;
+    std::vector<Sprite> sprites;
+    th::Optional<AimSpriteInfo> aimSpriteInfo;
+    th::Optional<WalkSpriteInfo> walkSpriteInfo;
 };

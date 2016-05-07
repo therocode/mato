@@ -9,11 +9,11 @@ class ResourceManager
 {
     public:
         void loadAll();
-        const std::vector<RenderDisplay>& displays() const;
-        int32_t displayFromName(const std::string& name) const;
+        const std::vector<Appearance>& appearances() const;
+        int32_t appearanceFromName(const std::string& name) const;
     private:
         std::unordered_map<std::string, fea::Texture> mTextures;
         std::unordered_map<std::string, fea::Animation> mAnimations;
-        std::vector<RenderDisplay> mDisplays;
-        std::unordered_map<std::string, int32_t> mDisplayNameIndex;
+        std::vector<Appearance> mAppearances;
+        std::unordered_map<std::string, int32_t> mAppearanceNameIndex;
 };

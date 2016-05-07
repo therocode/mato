@@ -22,9 +22,9 @@ class Mato : public fea::Application,
     private:
         void createInitialData();
         void updateActionDurations(const std::vector<Action>& actions);
-        void updateAimDisplays();
-        void updateWalkDisplays();
-        void renderDisplays();
+        void updateAimSprites();
+        void updateWalkSprites();
+        void renderSprites();
         fea::MessageBus mBus;
         fea::Window mWindow;
         fea::Renderer2D mFeaRenderer;
@@ -43,9 +43,9 @@ class Mato : public fea::Application,
         std::vector<Aim> mAims;
         std::vector<Health> mHealth;
         std::vector<ActionDuration> mActionDurations;
-        std::vector<DisplayInstance> mDisplays;
-        std::vector<AimDisplayInfo> mAimDisplayInfo;
-        std::vector<WalkDisplayInfo> mWalkDisplayInfo;
+        std::vector<Sprite> mSprites;
+        std::vector<AimSpriteInfo> mAimSpriteInfos;
+        std::vector<WalkSpriteInfo> mWalkSpriteInfos;
 
         PixelMap mLandscapeForeground;
 };

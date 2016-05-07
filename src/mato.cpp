@@ -19,7 +19,7 @@ Mato::Mato() :
     mFeaInputHandler(new fea::SDL2InputBackend()),
     mInputHandler(mBus, mFeaInputHandler),
     mAudioPlayer(mBus),
-    mRenderer(mFeaRenderer, mResources.displays())
+    mRenderer(mFeaRenderer, mResources.appearances())
 {
     mWindow.setVSyncEnabled(true);
     mWindow.setFramerateLimit(60);
@@ -43,11 +43,11 @@ void Mato::addObject(Object object)
     emplaceOptional(std::move(object.health), mHealth);
     emplaceOptional(std::move(object.aim), mAims);
 
-    for(auto& displayInstance : object.displays)
-        mDisplays.emplace_back(std::move(displayInstance));
+    for(auto& sprite : object.sprites)
+        mSprites.emplace_back(std::move(sprite));
 
-    emplaceOptional(std::move(object.aimDisplayInfo), mAimDisplayInfo);
-    emplaceOptional(std::move(object.walkDisplayInfo), mWalkDisplayInfo);
+    emplaceOptional(std::move(object.aimSpriteInfo), mAimSpriteInfos);
+    emplaceOptional(std::move(object.walkSpriteInfo), mWalkSpriteInfos);
 }
 
 void Mato::loop()
@@ -57,12 +57,12 @@ void Mato::loop()
     updateActionDurations(actions);
     applyActions(actions, mPositions, mAims, walkSpeed, aimSpeed);
 
-    updateAimDisplays();
-    updateWalkDisplays();
+    updateAimSprites();
+    updateWalkSprites();
 
     mRenderer.startFrame();
     mRenderer.renderWorld(mLandscapeForeground.pixels(), mLandscapeForeground.size());
-    renderDisplays();
+    renderSprites();
 
     mWindow.swapBuffers();
     mAudioPlayer.update();
@@ -106,23 +106,23 @@ void Mato::updateActionDurations(const std::vector<Action>& actions)
     mActionDurations.shrink_to_fit();
 }
 
-void Mato::updateAimDisplays()
+void Mato::updateAimSprites()
 {
-    for(const auto& aimDisplayInfo : mAimDisplayInfo)
+    for(const auto& aimSpriteInfo : mAimSpriteInfos)
     {
-        int32_t objectId = aimDisplayInfo.objectId;
-        int32_t displayId = aimDisplayInfo.displayId;
+        int32_t objectId = aimSpriteInfo.objectId;
+        int32_t appearanceId = aimSpriteInfo.appearanceId;
 
-        DisplayInstance* displayToUpdate = findIf(mDisplays, [objectId, displayId] (const DisplayInstance& entry)
+        Sprite* spriteToUpdate = findIf(mSprites, [objectId, appearanceId] (const Sprite& entry)
         {
-            return entry.objectId == objectId && entry.displayId == displayId;
+            return entry.objectId == objectId && entry.appearanceId == appearanceId;
         });
 
-        TH_ASSERT(displayToUpdate, "There is aim display info for object: " << objectId << " with display " << displayId << " but there is no such display instance");
+        TH_ASSERT(spriteToUpdate, "There is aim sprite info for object: " << objectId << " with appearance " << appearanceId << " but there is no such sprite instance");
 
-        const RenderDisplay* display = findIf(mResources.displays(), [displayId] (const RenderDisplay& entry)
+        const Appearance* appearance = findIf(mResources.appearances(), [appearanceId] (const Appearance& entry)
         {
-            return entry.displayId == displayId;
+            return entry.appearanceId == appearanceId;
         });
 
         const Aim* aim = findIf(mAims, [objectId] (const Aim& entry)
@@ -130,28 +130,28 @@ void Mato::updateAimDisplays()
             return objectId == entry.objectId;
         });
 
-        TH_ASSERT(aim, "There is aim display info for object: " << objectId << " but there is no aim for it");
+        TH_ASSERT(aim, "There is aim sprite info for object: " << objectId << " but there is no aim for it");
 
-        auto aimGraphics = toAimGraphics(aim->aim, display->animation->getFrameAmount());
+        auto aimGraphics = toAimGraphics(aim->aim, appearance->animation->getFrameAmount());
         
-        displayToUpdate->flip = aimGraphics.flip;
-        displayToUpdate->animationProgress = aimGraphics.keyFrame;       
+        spriteToUpdate->flip = aimGraphics.flip;
+        spriteToUpdate->animationProgress = aimGraphics.keyFrame;       
     }
 }
 
-void Mato::updateWalkDisplays()
+void Mato::updateWalkSprites()
 {
-    for(const auto& walkDisplayInfo : mWalkDisplayInfo)
+    for(const auto& walkSpriteInfo : mWalkSpriteInfos)
     {
-        int32_t objectId = walkDisplayInfo.objectId;
-        int32_t displayId = walkDisplayInfo.displayId;
+        int32_t objectId = walkSpriteInfo.objectId;
+        int32_t appearanceId = walkSpriteInfo.appearanceId;
 
-        DisplayInstance* displayToUpdate = findIf(mDisplays, [objectId, displayId] (const DisplayInstance& entry)
+        Sprite* spriteToUpdate = findIf(mSprites, [objectId, appearanceId] (const Sprite& entry)
         {
-            return entry.objectId == objectId && entry.displayId == displayId;
+            return entry.objectId == objectId && entry.appearanceId == appearanceId;
         });
 
-        TH_ASSERT(displayToUpdate, "There is walk display info for object: " << objectId << " with display " << displayId << " but there is no such display instance");
+        TH_ASSERT(spriteToUpdate, "There is walk sprite info for object: " << objectId << " with appearance " << appearanceId << " but there is no such sprite instance");
 
         const ActionDuration* actionDuration = findIf(mActionDurations, [objectId] (const ActionDuration& entry)
         {
@@ -160,30 +160,30 @@ void Mato::updateWalkDisplays()
 
         if(actionDuration)
         {
-            displayToUpdate->flip = actionDuration->action == ActionType::WALK_LEFT;
-            displayToUpdate->animationProgress = actionDuration->duration;
+            spriteToUpdate->flip = actionDuration->action == ActionType::WALK_LEFT;
+            spriteToUpdate->animationProgress = actionDuration->duration;
         }
     }
 }
 
-void Mato::renderDisplays()
+void Mato::renderSprites()
 {
     std::vector<RenderOrder> orders;
 
-    for(const auto& display : mDisplays)
+    for(const auto& sprite : mSprites)
     {
-        auto idFinder = [&display] (const auto& entry) { return entry.objectId == display.objectId; };
+        auto idFinder = [&sprite] (const auto& entry) { return entry.objectId == sprite.objectId; };
 
-        const Position* position = findIf(mPositions, idFinder); TH_ASSERT(position, "Entry with Display ID " << display.displayId << " had a display but no position");
+        const Position* position = findIf(mPositions, idFinder); TH_ASSERT(position, "Entry with Display ID " << sprite.appearanceId << " had a sprite but no position");
 
         orders.emplace_back(
             RenderOrder{
                 position->position,
-                display.size,
-                display.displayId,
-                display.rotation,
-                display.animationProgress,
-                display.flip,
+                sprite.size,
+                sprite.appearanceId,
+                sprite.rotation,
+                sprite.animationProgress,
+                sprite.flip,
             }
         );
     }

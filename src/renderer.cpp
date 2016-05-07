@@ -3,9 +3,9 @@
 #include "texturemaker.hpp"
 #include "vectorutil.hpp"
 
-Renderer::Renderer(fea::Renderer2D& renderer, const std::vector<RenderDisplay>& displays):
+Renderer::Renderer(fea::Renderer2D& renderer, const std::vector<Appearance>& appearances):
     mRenderer(renderer),
-    mDisplays(displays)
+    mAppearances(appearances)
 {
 }
 
@@ -28,19 +28,19 @@ void Renderer::render(const std::vector<RenderOrder>& orders) const
 {
     for(const auto& renderOrder : orders)
     {
-        const RenderDisplay* display = findIf(mDisplays, [&renderOrder] (const RenderDisplay& disp) { return disp.displayId == renderOrder.displayId; });
-        TH_ASSERT(display, "render order uses invalid display " << renderOrder.displayId);
+        const Appearance* appearance = findIf(mAppearances, [&renderOrder] (const Appearance& disp) { return disp.appearanceId == renderOrder.appearanceId; });
+        TH_ASSERT(appearance, "render order uses invalid appearance " << renderOrder.appearanceId);
 
         fea::AnimatedQuad quad(renderOrder.size);
 
-        if(display->texture)
-            quad.setTexture(*display->texture);
-        if(display->animation)
-            quad.setAnimation(*display->animation);
+        if(appearance->texture)
+            quad.setTexture(*appearance->texture);
+        if(appearance->animation)
+            quad.setAnimation(*appearance->animation);
 
-        quad.setAnimationFrame(renderOrder.animationProgress / display->animation->getDelay() % display->animation->getFrameAmount());
+        quad.setAnimationFrame(renderOrder.animationProgress / appearance->animation->getDelay() % appearance->animation->getFrameAmount());
 
-        auto offset = display->offset;
+        auto offset = appearance->offset;
         if(renderOrder.flip)
             offset.x *= -1.0f;
 

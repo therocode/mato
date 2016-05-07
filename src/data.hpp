@@ -37,35 +37,35 @@ struct Health
     int32_t health;
 };
 
-struct AimDisplayInfo
+struct AimSpriteInfo
 {
     int32_t objectId;
-    int32_t displayId;
+    int32_t appearanceId;
 };
 
-struct WalkDisplayInfo
+struct WalkSpriteInfo
 {
     int32_t objectId;
-    int32_t displayId;
+    int32_t appearanceId;
 };
 
-//many-to-many relationship between objects and render displays
-struct DisplayInstance
+//rendering data
+//many-to-many relationship between objects and appearances
+struct Sprite
 {
     int32_t objectId;
-    int32_t displayId;
+    int32_t appearanceId;
     glm::vec2 size;
     float rotation;
     int32_t animationProgress;
     bool flip;
 };
 
-//rendering data
 struct RenderOrder
 {
     glm::vec2 position;
     glm::vec2 size;
-    int32_t displayId;
+    int32_t appearanceId;
     float rotation = pi / 2.0f;
     int32_t animationProgress = 0;
     bool flip;
@@ -77,9 +77,9 @@ namespace fea
     class Animation;
 }
 
-struct RenderDisplay
+struct Appearance
 {
-    int32_t displayId;
+    int32_t appearanceId;
     glm::vec2 offset;
     const fea::Texture* texture;
     const fea::Animation* animation;
