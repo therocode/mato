@@ -19,10 +19,19 @@ struct ActionDuration
     int32_t duration;
 };
 
+//physics data
+
 struct Position
 {
     int32_t objectId;
     glm::vec2 position;
+};
+
+struct Physics
+{
+    int32_t objectId;
+    glm::vec2 velocity;
+    glm::vec2 acceleration;
 };
 
 struct Aim

@@ -9,6 +9,12 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
 
     if(type == PLAYER)
     {
+        result.physics = Physics
+        {
+            id,
+            {},
+            {},
+        };
         result.aim = Aim{id, pi/2.0f};
         result.health = Health{id, 100};
         result.sprites =

@@ -7,6 +7,7 @@
 #include "vectorutil.hpp"
 #include "action.hpp"
 #include "aimgraphics.hpp"
+#include "physics.hpp"
 #include <fea/ui/sdl2windowbackend.hpp>
 #include <fea/ui/sdl2inputbackend.hpp>
 
@@ -40,6 +41,7 @@ void Mato::handleMessage(const QuitMessage& message)
 void Mato::addObject(Object object)
 {
     emplaceOptional(std::move(object.position), mPositions);
+    emplaceOptional(std::move(object.physics), mPhysics);
     emplaceOptional(std::move(object.health), mHealth);
     emplaceOptional(std::move(object.aim), mAims);
 
@@ -59,6 +61,9 @@ void Mato::loop()
 
     updateAimSprites();
     updateWalkSprites();
+
+    updateVelocities(mPhysics, 0.5f);
+    updatePositions(mPhysics, mPositions);
 
     mRenderer.startFrame();
     mRenderer.renderWorld(mLandscapeForeground.pixels(), mLandscapeForeground.size());

@@ -7,6 +7,7 @@ enum ObjectType { PLAYER };
 struct Object
 {
     th::Optional<Position> position;
+    th::Optional<Physics> physics;
     th::Optional<Aim> aim;
     th::Optional<Health> health;
     std::vector<Sprite> sprites;
