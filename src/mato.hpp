@@ -7,6 +7,7 @@
 #include "audioplayer.hpp"
 #include "renderer.hpp"
 #include "pixelmap.hpp"
+#include "collisionmap.hpp"
 #include "resourcemanager.hpp"
 #include "object.hpp"
 
@@ -49,4 +50,5 @@ class Mato : public fea::Application,
         std::vector<WalkSpriteInfo> mWalkSpriteInfos;
 
         PixelMap mLandscapeForeground;
+        CollisionMap mLandscapeCollision;
 };

@@ -79,6 +79,7 @@ void Mato::createInitialData()
     addObject(createObject(1, PLAYER, {1105.0f, 384.0f}, mResources));
 
     mLandscapeForeground = makePixelMap("data/textures/worldforeground.png");
+    mLandscapeCollision = makeCollisionMap("data/textures/worldcollision.png");
 }
 
 void Mato::updateActionDurations(const std::vector<Action>& actions)

@@ -34,6 +34,19 @@ struct Physics
     glm::vec2 acceleration;
 };
 
+struct CollisionBox
+{
+    int32_t objectId;
+    glm::vec2 start;
+    glm::vec2 size;
+};
+
+struct BottomRestPercent
+{
+    int32_t objectId;
+    float bottomRestPercent;
+};
+
 struct Aim
 {
     int32_t objectId;
