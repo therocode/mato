@@ -10,4 +10,6 @@ struct Object
     th::Optional<PlayerAim> playerAim;
     th::Optional<Health> health;
     std::vector<DisplayInstance> displays;
+    th::Optional<AimDispayInfo> aimDisplayInfo;
+    th::Optional<WalkDispayInfo> walkDisplayInfo;
 };

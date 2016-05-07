@@ -38,10 +38,12 @@ class Mato : public fea::Application,
         
         //game data
         std::vector<Position> mPositions;
-        std::vector<PlayerAim> mPlayerAims;
+        std::vector<PlayerAim> mAims;
         std::vector<Health> mHealth;
         std::vector<ActionDuration> mActionDurations;
         std::vector<DisplayInstance> mDisplays;
+        std::vector<AimDisplayInfo> mAimDisplayInfo;
+        std::vector<WalkDisplayInfo> mWalkDisplayInfo;
 
         PixelMap mLandscapeForeground;
 };

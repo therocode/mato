@@ -33,6 +33,16 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
                 0,
                 false,
             },
+            AimDisplayInfo
+            {
+                id,
+                5,
+            },
+            WalkDisplayInfo
+            {
+                id,
+                4,
+            },
         };
     }
 

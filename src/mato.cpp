@@ -44,6 +44,9 @@ void Mato::addObject(Object object)
 
     for(auto& displayInstance : object.displays)
         mDisplays.emplace_back(std::move(displayInstance));
+
+    emplaceOptional(std::move(object.aimDisplayInfo), mAimDisplayInfo);
+    emplaceOptional(std::move(object.walkDisplayInfo), mWalkDisplayInfo);
 }
 
 void Mato::loop()

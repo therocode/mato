@@ -37,16 +37,16 @@ struct Health
     int32_t health;
 };
 
-struct HeadBodyDisplayInstance
+struct AimDisplayInfo
 {
     int32_t objectId;
-    int32_t headDisplayId;
-    int32_t headAnimationProgress;
-    glm::vec2 headSize;
-    int32_t bodyDisplayId;
-    int32_t bodyAnimationProgress;
-    glm::vec2 bodySize;
-    bool flip;
+    int32_t aimFrameAmount;
+};
+
+struct WalkDisplayInfo
+{
+    int32_t objectId;
+    int32_t walkFrameAmount;
 };
 
 //many-to-many relationship between objects and render displays
