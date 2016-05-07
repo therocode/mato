@@ -22,6 +22,8 @@ class Mato : public fea::Application,
     private:
         void createInitialData();
         void updateActionDurations(const std::vector<Action>& actions);
+        void updateAimDisplays();
+        void updateWalkDisplays();
         void renderDisplays();
         fea::MessageBus mBus;
         fea::Window mWindow;
@@ -38,7 +40,7 @@ class Mato : public fea::Application,
         
         //game data
         std::vector<Position> mPositions;
-        std::vector<PlayerAim> mAims;
+        std::vector<Aim> mAims;
         std::vector<Health> mHealth;
         std::vector<ActionDuration> mActionDurations;
         std::vector<DisplayInstance> mDisplays;

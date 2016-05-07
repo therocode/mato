@@ -9,7 +9,7 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
 
     if(type == PLAYER)
     {
-        result.playerAim = PlayerAim{id, pi/2.0f};
+        result.aim = Aim{id, pi/2.0f};
         result.health = Health{id, 100};
         result.displays =
         {
@@ -33,16 +33,18 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
                 0,
                 false,
             },
-            AimDisplayInfo
-            {
-                id,
-                5,
-            },
-            WalkDisplayInfo
-            {
-                id,
-                4,
-            },
+        };
+        result.aimDisplayInfo = AimDisplayInfo
+        {
+            id,
+            resources.displayFromName("head_aim"),
+            5,
+        };
+        result.walkDisplayInfo = WalkDisplayInfo
+        {
+            id,
+            resources.displayFromName("body_idle"),
+            4,
         };
     }
 

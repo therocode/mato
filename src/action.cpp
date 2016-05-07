@@ -2,7 +2,7 @@
 #include "aim.hpp"
 #include "binarysearch.hpp"
 
-void applyActions(const std::vector<Action>& actions, std::vector<Position>& positions, std::vector<PlayerAim>& playerAims, float walkSpeed, float playerAimSpeed)
+void applyActions(const std::vector<Action>& actions, std::vector<Position>& positions, std::vector<Aim>& aims, float walkSpeed, float aimSpeed)
 {
     for(const auto& actionData : actions)
     {
@@ -13,34 +13,34 @@ void applyActions(const std::vector<Action>& actions, std::vector<Position>& pos
             return position.objectId == id;
         });
 
-        auto playerAimIter = binarySearch(playerAims.begin(), playerAims.end(), actionData.objectId, [] (int32_t id, const PlayerAim& playerAim)
+        auto aimIter = binarySearch(aims.begin(), aims.end(), actionData.objectId, [] (int32_t id, const Aim& aim)
         {
-            return playerAim.objectId == id;
+            return aim.objectId == id;
         });
 
-        if(positionIter != positions.end() && playerAimIter != playerAims.end())
+        if(positionIter != positions.end() && aimIter != aims.end())
         {
             glm::vec2& position = positionIter->position;
-            float& playerAim = playerAimIter->aim;
+            float& aim = aimIter->aim;
 
             if(action == ActionType::WALK_RIGHT)
             {
                 position.x += walkSpeed;
 
-                if(aimLeft(playerAim))
-                    playerAim = turnAim(playerAim);
+                if(aimLeft(aim))
+                    aim = turnAim(aim);
             }
             if(action == ActionType::WALK_LEFT)
             {
                 position.x -= walkSpeed;
 
-                if(!aimLeft(playerAim))
-                    playerAim = turnAim(playerAim);
+                if(!aimLeft(aim))
+                    aim = turnAim(aim);
             }
             if(action == ActionType::AIM_UP)
-                playerAim = moveAim(playerAim, playerAimSpeed);
+                aim = moveAim(aim, aimSpeed);
             if(action == ActionType::AIM_DOWN)
-                playerAim = moveAim(playerAim, -playerAimSpeed);
+                aim = moveAim(aim, -aimSpeed);
         }
     }
 }

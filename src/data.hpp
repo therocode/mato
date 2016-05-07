@@ -25,7 +25,7 @@ struct Position
     glm::vec2 position;
 };
 
-struct PlayerAim
+struct Aim
 {
     int32_t objectId;
     float aim;
@@ -40,12 +40,14 @@ struct Health
 struct AimDisplayInfo
 {
     int32_t objectId;
+    int32_t displayId;
     int32_t aimFrameAmount;
 };
 
 struct WalkDisplayInfo
 {
     int32_t objectId;
+    int32_t displayId;
     int32_t walkFrameAmount;
 };
 

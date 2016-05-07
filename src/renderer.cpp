@@ -1,25 +1,7 @@
 #include "pi.hpp"
 #include "renderer.hpp"
 #include "texturemaker.hpp"
-#include "aim.hpp"
 #include "vectorutil.hpp"
-
-struct AimGraphics
-{
-    int32_t keyFrame;
-    bool flip;
-};
-
-AimGraphics toAimGraphics(float aim)
-{
-    bool flip = aimLeft(aim);
-
-    aim = std::abs(aim);
-
-    int32_t keyFrame = static_cast<int32_t>(aim / (pi / 5.0f));
-
-    return {keyFrame, flip};
-}
 
 Renderer::Renderer(fea::Renderer2D& renderer, const std::vector<RenderDisplay>& displays):
     mRenderer(renderer),

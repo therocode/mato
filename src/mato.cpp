@@ -6,6 +6,7 @@
 #include "createobject.hpp"
 #include "vectorutil.hpp"
 #include "action.hpp"
+#include "aimgraphics.hpp"
 #include <fea/ui/sdl2windowbackend.hpp>
 #include <fea/ui/sdl2inputbackend.hpp>
 
@@ -40,7 +41,7 @@ void Mato::addObject(Object object)
 {
     emplaceOptional(std::move(object.position), mPositions);
     emplaceOptional(std::move(object.health), mHealth);
-    emplaceOptional(std::move(object.playerAim), mPlayerAims);
+    emplaceOptional(std::move(object.aim), mAims);
 
     for(auto& displayInstance : object.displays)
         mDisplays.emplace_back(std::move(displayInstance));
@@ -54,7 +55,10 @@ void Mato::loop()
     std::vector<Action> actions = mInputHandler.process();
 
     updateActionDurations(actions);
-    applyActions(actions, mPositions, mPlayerAims, walkSpeed, aimSpeed);
+    applyActions(actions, mPositions, mAims, walkSpeed, aimSpeed);
+
+    updateAimDisplays();
+    updateWalkDisplays();
 
     mRenderer.startFrame();
     mRenderer.renderWorld(mLandscapeForeground.pixels(), mLandscapeForeground.size());
@@ -100,6 +104,38 @@ void Mato::updateActionDurations(const std::vector<Action>& actions)
 
     mActionDurations = newDurations;
     mActionDurations.shrink_to_fit();
+}
+
+void Mato::updateAimDisplays()
+{
+    for(const auto& aimDisplayInfo : mAimDisplayInfo)
+    {
+        int32_t objectId = aimDisplayInfo.objectId;
+        int32_t displayId = aimDisplayInfo.displayId;
+
+        DisplayInstance* displayToUpdate = findIf(mDisplays, [objectId, displayId] (const DisplayInstance& entry)
+        {
+            return entry.objectId == objectId && entry.displayId == displayId;
+        });
+
+        TH_ASSERT(displayToUpdate, "There is aim display info for object: " << objectId << " with display " << displayId << " but there is no such display instance");
+
+        const Aim* aim = findIf(mAims, [objectId] (const Aim& entry)
+        {
+            return objectId == entry.objectId;
+        });
+
+        TH_ASSERT(aim, "There is aim display info for object: " << objectId << " but there is no aim for it");
+
+        auto aimGraphics = toAimGraphics(aim->aim, aimDisplayInfo.aimFrameAmount);
+        
+        displayToUpdate->flip = aimGraphics.flip;
+        displayToUpdate->animationProgress = aimGraphics.keyFrame;       
+    }
+}
+
+void Mato::updateWalkDisplays()
+{
 }
 
 void Mato::renderDisplays()
