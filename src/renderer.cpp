@@ -40,7 +40,11 @@ void Renderer::render(const std::vector<RenderOrder>& orders) const
 
         quad.setAnimationFrame(renderOrder.animationProgress / display->animation->getDelay() % display->animation->getFrameAmount());
 
-        quad.setPosition(renderOrder.position + display->offset);
+        auto offset = display->offset;
+        if(renderOrder.flip)
+            offset.x *= -1.0f;
+
+        quad.setPosition(renderOrder.position + offset);
         quad.setRotation(renderOrder.rotation - pi / 2.0f); //take away pi/2.0f which is a quarter of a full turn because featherkit expects 0 degrees to be --> but in the game, it is downwards
         quad.setHFlip(renderOrder.flip);
 

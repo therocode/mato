@@ -41,14 +41,12 @@ struct AimDisplayInfo
 {
     int32_t objectId;
     int32_t displayId;
-    int32_t aimFrameAmount;
 };
 
 struct WalkDisplayInfo
 {
     int32_t objectId;
     int32_t displayId;
-    int32_t walkFrameAmount;
 };
 
 //many-to-many relationship between objects and render displays

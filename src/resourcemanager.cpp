@@ -12,7 +12,7 @@ void ResourceManager::loadAll()
     };
 
     mAnimations.emplace("body_idle", fea::Animation{{0,0}, {24, 12}, 1, 10}); //body idle 0
-    mAnimations.emplace("body_walk", fea::Animation{{0,0}, {24, 24}, 4, 10}); //body walk 1
+    mAnimations.emplace("body_walk", fea::Animation{{0,0}, {24, 12}, 4, 10}); //body walk 1
     mAnimations.emplace("head_aim", fea::Animation{{0,0}, {28, 36}, 5, 1}); //head aim 2
 
     auto animation = [this] (const std::string& name)
@@ -27,7 +27,7 @@ void ResourceManager::loadAll()
     };
 
     newDisplay("body_idle", RenderDisplay{0, {-12.0f, 24.0f}, texture("body"), animation("body_idle")});
-    newDisplay("body_walk", RenderDisplay{1, {-12.0f, 24.0f}, texture("body"), animation("body_walk")});
+    newDisplay("body_walk", RenderDisplay{1, {-12.0f, 20.0f}, texture("body"), animation("body_walk")});
     newDisplay("head_aim", RenderDisplay{2, {-4.0f, -8.0f}, texture("head"), animation("head_aim")});
 }
 

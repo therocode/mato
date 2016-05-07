@@ -120,6 +120,11 @@ void Mato::updateAimDisplays()
 
         TH_ASSERT(displayToUpdate, "There is aim display info for object: " << objectId << " with display " << displayId << " but there is no such display instance");
 
+        const RenderDisplay* display = findIf(mResources.displays(), [displayId] (const RenderDisplay& entry)
+        {
+            return entry.displayId == displayId;
+        });
+
         const Aim* aim = findIf(mAims, [objectId] (const Aim& entry)
         {
             return objectId == entry.objectId;
@@ -127,7 +132,7 @@ void Mato::updateAimDisplays()
 
         TH_ASSERT(aim, "There is aim display info for object: " << objectId << " but there is no aim for it");
 
-        auto aimGraphics = toAimGraphics(aim->aim, aimDisplayInfo.aimFrameAmount);
+        auto aimGraphics = toAimGraphics(aim->aim, display->animation->getFrameAmount());
         
         displayToUpdate->flip = aimGraphics.flip;
         displayToUpdate->animationProgress = aimGraphics.keyFrame;       
@@ -136,6 +141,29 @@ void Mato::updateAimDisplays()
 
 void Mato::updateWalkDisplays()
 {
+    for(const auto& walkDisplayInfo : mWalkDisplayInfo)
+    {
+        int32_t objectId = walkDisplayInfo.objectId;
+        int32_t displayId = walkDisplayInfo.displayId;
+
+        DisplayInstance* displayToUpdate = findIf(mDisplays, [objectId, displayId] (const DisplayInstance& entry)
+        {
+            return entry.objectId == objectId && entry.displayId == displayId;
+        });
+
+        TH_ASSERT(displayToUpdate, "There is walk display info for object: " << objectId << " with display " << displayId << " but there is no such display instance");
+
+        const ActionDuration* actionDuration = findIf(mActionDurations, [objectId] (const ActionDuration& entry)
+        {
+            return objectId == entry.objectId && (entry.action == ActionType::WALK_LEFT || entry.action == ActionType::WALK_RIGHT);
+        });
+
+        if(actionDuration)
+        {
+            displayToUpdate->flip = actionDuration->action == ActionType::WALK_LEFT;
+            displayToUpdate->animationProgress = actionDuration->duration;
+        }
+    }
 }
 
 void Mato::renderDisplays()

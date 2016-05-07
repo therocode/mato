@@ -13,6 +13,16 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
         result.health = Health{id, 100};
         result.displays =
         {
+            //body
+            DisplayInstance
+            {
+                id,
+                resources.displayFromName("body_walk"),
+                {24.0f, 12.0f}, //size
+                pi / 2.0f,
+                0,
+                false,
+            },
             //head
             DisplayInstance
             {
@@ -23,28 +33,16 @@ Object createObject(int32_t id, ObjectType type, glm::vec2 position, const Resou
                 0,
                 false,
             },
-            //body
-            DisplayInstance
-            {
-                id,
-                resources.displayFromName("body_idle"),
-                {24.0f, 12.0f}, //size
-                pi / 2.0f,
-                0,
-                false,
-            },
+        };
+        result.walkDisplayInfo = WalkDisplayInfo
+        {
+            id,
+            resources.displayFromName("body_walk"),
         };
         result.aimDisplayInfo = AimDisplayInfo
         {
             id,
             resources.displayFromName("head_aim"),
-            5,
-        };
-        result.walkDisplayInfo = WalkDisplayInfo
-        {
-            id,
-            resources.displayFromName("body_idle"),
-            4,
         };
     }
 
